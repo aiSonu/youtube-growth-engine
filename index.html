@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Intelligence — Content Strategy Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink:       #0d0d0f;
+    --ink-2:     #3a3a42;
+    --ink-3:     #8a8a96;
+    --surface:   #f5f4f0;
+    --surface-2: #eceae4;
+    --surface-3: #e2e0d8;
+    --line:      #d8d6ce;
+    --accent:    #c8432a;
+    --accent-2:  #e85d40;
+    --gold:      #c9933a;
+    --white:     #fdfcfa;
+    --radius:    12px;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Outfit', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid background ──────────────────────────────────── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ───────────────────────────────────────────── */
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── Header ───────────────────────────────────────────── */
+  header {
+    padding: 52px 0 40px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 56px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .logo-block {}
+
+  .logo-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .logo-title {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4vw, 40px);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .logo-title em {
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .header-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--ink);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 6px 12px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── Input Section ────────────────────────────────────── */
+  .input-section {
+    margin-bottom: 56px;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .input-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  .url-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .url-input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .url-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-3);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .url-input {
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 14px 14px 40px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .url-input::placeholder { color: var(--ink-3); }
+
+  .url-input:focus {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(13,13,15,0.07);
+  }
+
+  .analyze-btn {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .analyze-btn:hover { background: var(--accent-2); }
+  .analyze-btn:active { transform: scale(0.98); }
+  .analyze-btn:disabled { background: var(--ink-3); cursor: not-allowed; transform: none; }
+
+  .btn-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  .analyze-btn.loading .btn-spinner { display: block; }
+  .analyze-btn.loading .btn-text { display: none; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .input-hint {
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 12px;
+    font-family: var(--mono);
+  }
+
+  /* ── Status Bar ───────────────────────────────────────── */
+  .status-bar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: var(--ink);
+    color: var(--white);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-top: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .status-bar.visible { display: flex; }
+
+  .status-step {
+    color: var(--gold);
+  }
+
+  /* ── Error Bar ────────────────────────────────────────── */
+  .error-bar {
+    display: none;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff5f5;
+    border: 1px solid #fca5a5;
+    color: #991b1b;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .error-bar.visible { display: flex; }
+
+  /* ── Results ──────────────────────────────────────────── */
+  #results { display: none; }
+  #results.visible { display: block; }
+
+  /* ── Channel Card ─────────────────────────────────────── */
+  .channel-card {
+    background: var(--ink);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .channel-card::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,67,42,0.2) 0%, transparent 70%);
+  }
+
+  .channel-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--ink-2);
+  }
+
+  .channel-info { flex: 1; }
+
+  .channel-name {
+    font-family: var(--serif);
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .channel-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+    max-width: 500px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .channel-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 14px;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: var(--mono);
+  }
+
+  /* ── Tabs ─────────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 28px;
+    overflow-x: auto;
+  }
+
+  .tab-btn {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-3);
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    padding: 9px 18px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.18s;
+    flex-shrink: 0;
+  }
+
+  .tab-btn:hover { color: var(--ink); background: rgba(0,0,0,0.04); }
+
+  .tab-btn.active {
+    color: var(--ink);
+    background: var(--white);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Video Grid ───────────────────────────────────────── */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .video-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .video-card:hover {
+    box-shadow: 0 6px 24px rgba(0,0,0,0.09);
+    transform: translateY(-2px);
+  }
+
+  .video-thumb-wrap {
+    position: relative;
+    aspect-ratio: 16/9;
+    background: var(--surface-3);
+    overflow: hidden;
+  }
+
+  .video-thumb-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-rank {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .video-body { padding: 14px 16px; }
+
+  .video-title {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 10px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .video-pill {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-3);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .video-pill.views { color: var(--gold); background: #fdf8ee; border-color: #f0e0b0; }
+
+  .video-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--accent);
+    text-decoration: none;
+    margin-top: 10px;
+    font-family: var(--mono);
+  }
+
+  .video-link:hover { text-decoration: underline; }
+
+  /* ── Analysis Cards ───────────────────────────────────── */
+  .analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 680px) {
+    .analysis-grid { grid-template-columns: 1fr; }
+    .url-row { flex-direction: column; }
+    header { flex-direction: column; align-items: flex-start; }
+  }
+
+  .analysis-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+  }
+
+  .analysis-card.full { grid-column: 1 / -1; }
+  .analysis-card.accent-border { border-left: 3px solid var(--accent); }
+  .analysis-card.gold-border { border-left: 3px solid var(--gold); }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-label-icon { font-size: 12px; }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .card-body {
+    font-size: 13.5px;
+    color: var(--ink-2);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  /* Ideas list */
+  .ideas-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .idea-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    transition: border-color 0.2s;
+  }
+
+  .idea-item:hover { border-color: var(--ink-3); }
+
+  .idea-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .idea-text {
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* ── Report Tab ───────────────────────────────────────── */
+  .report-wrap {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .report-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface-2);
+  }
+
+  .report-toolbar-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink);
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .copy-btn:hover { background: var(--surface); }
+  .copy-btn.copied { color: #16a34a; border-color: #86efac; }
+
+  .report-body {
+    padding: 28px 32px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.85;
+    color: var(--ink-2);
+    white-space: pre-wrap;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+
+  /* ── JSON Tab ─────────────────────────────────────────── */
+  .json-wrap {
+    background: var(--ink);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .json-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .json-toolbar-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+  }
+
+  .json-body {
+    padding: 24px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    color: #a8c8a0;
+    white-space: pre-wrap;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* ── Empty State ──────────────────────────────────────── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-3);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+    opacity: 0.4;
+  }
+
+  .empty-title {
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--ink-2);
+    margin-bottom: 8px;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* ── Footer ───────────────────────────────────────────── */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-family: var(--mono);
+  }
+
+  /* ── Scrollbar ────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-block">
+      <div class="logo-eyebrow">Content Strategy Tool</div>
+      <h1 class="logo-title">YT <em>Intelligence</em></h1>
+    </div>
+    <div class="header-badge">
+      <div class="dot"></div>
+      Powered by Gemini
+    </div>
+  </header>
+
+  <!-- Input -->
+  <div class="input-section">
+    <div class="section-label">Analyze a channel</div>
+    <div class="input-card">
+      <div class="url-row">
+        <div class="url-input-wrap">
+          <span class="url-icon">⌘</span>
+          <input
+            class="url-input"
+            id="urlInput"
+            type="text"
+            placeholder="https://www.youtube.com/@channel"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+          <div class="btn-spinner"></div>
+          <span class="btn-text">Analyze →</span>
+        </button>
+      </div>
+      <div class="input-hint">Supports /@handle · /channel/ID · /user/name formats</div>
+
+      <!-- Status bar -->
+      <div class="status-bar" id="statusBar">
+        <div class="dot"></div>
+        <span class="status-step" id="statusStep">Initializing...</span>
+      </div>
+
+      <!-- Error bar -->
+      <div class="error-bar" id="errorBar">
+        <span>⚠</span>
+        <span id="errorMsg">Something went wrong.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+
+    <!-- Channel card -->
+    <div class="section-label">Channel overview</div>
+    <div class="channel-card" id="channelCard">
+      <img class="channel-thumb" id="chanThumb" src="" alt="">
+      <div class="channel-info">
+        <div class="channel-name" id="chanName">—</div>
+        <div class="channel-desc" id="chanDesc">—</div>
+        <div class="channel-stats">
+          <div class="stat">
+            <div class="stat-value" id="chanSubs">—</div>
+            <div class="stat-label">Subscribers</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="chanVideos">—</div>
+            <div class="stat-label">Total videos</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="chanLongform">—</div>
+            <div class="stat-label">Long-form analyzed</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="chanTranscripts">—</div>
+            <div class="stat-label">Transcripts</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('analysis', this)">AI Analysis</button>
+      <button class="tab-btn" onclick="switchTab('videos', this)">Video Categories</button>
+      <button class="tab-btn" onclick="switchTab('report', this)">Full Report</button>
+      <button class="tab-btn" onclick="switchTab('json', this)">Raw JSON</button>
+    </div>
+
+    <!-- TAB: AI Analysis -->
+    <div class="tab-panel active" id="tab-analysis">
+      <div class="analysis-grid">
+        <div class="analysis-card full accent-border">
+          <div class="card-label"><span class="card-label-icon">◈</span> Channel summary</div>
+          <div class="card-body" id="a-summary">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">◉</span> Content patterns</div>
+          <div class="card-title">What works consistently</div>
+          <div class="card-body" id="a-patterns">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">◎</span> Hook patterns</div>
+          <div class="card-title">First 10 seconds formula</div>
+          <div class="card-body" id="a-hooks">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">▣</span> Title frameworks</div>
+          <div class="card-title">Reusable templates</div>
+          <div class="card-body" id="a-titles">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">◆</span> Emotional triggers</div>
+          <div class="card-title">Fear · Curiosity · Aspiration</div>
+          <div class="card-body" id="a-emotions">—</div>
+        </div>
+        <div class="analysis-card full gold-border">
+          <div class="card-label"><span class="card-label-icon">◑</span> What works NOW (last 90 days)</div>
+          <div class="card-body" id="a-now">—</div>
+        </div>
+        <div class="analysis-card full">
+          <div class="card-label"><span class="card-label-icon">◐</span> Channel evolution</div>
+          <div class="card-title">First uploads → Now</div>
+          <div class="card-body" id="a-evolution">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">◇</span> Script angles</div>
+          <div class="card-title">Worth replicating</div>
+          <div class="card-body" id="a-scripts">—</div>
+        </div>
+        <div class="analysis-card">
+          <div class="card-label"><span class="card-label-icon">★</span> 5 Actionable video ideas</div>
+          <div class="card-title">Ready to film</div>
+          <ul class="ideas-list" id="a-ideas"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Videos -->
+    <div class="tab-panel" id="tab-videos">
+      <div class="section-label">Most popular (all time)</div>
+      <div class="video-grid" id="grid-popular"></div>
+
+      <div class="section-label">Most popular (last 90 days)</div>
+      <div class="video-grid" id="grid-recent90"></div>
+
+      <div class="section-label">Most recent uploads</div>
+      <div class="video-grid" id="grid-mostrecent"></div>
+
+      <div class="section-label">First uploaded</div>
+      <div class="video-grid" id="grid-first"></div>
+    </div>
+
+    <!-- TAB: Report -->
+    <div class="tab-panel" id="tab-report">
+      <div class="report-wrap">
+        <div class="report-toolbar">
+          <span class="report-toolbar-label">Markdown report</span>
+          <button class="copy-btn" id="copyReportBtn" onclick="copyReport()">Copy</button>
+        </div>
+        <div class="report-body" id="reportBody">—</div>
+      </div>
+    </div>
+
+    <!-- TAB: JSON -->
+    <div class="tab-panel" id="tab-json">
+      <div class="json-wrap">
+        <div class="json-toolbar">
+          <span class="json-toolbar-label">raw json output</span>
+          <button class="copy-btn" id="copyJsonBtn" onclick="copyJson()" style="color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.1)">Copy</button>
+        </div>
+        <div class="json-body" id="jsonBody">—</div>
+      </div>
+    </div>
+
+  </div><!-- /results -->
+
+  <footer>
+    <span>YT Intelligence Agent</span>
+    <span id="footerGen">—</span>
+  </footer>
+
+</div><!-- /shell -->
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Replace with your actual n8n webhook URL after importing the workflow
+const N8N_WEBHOOK_URL = 'YOUR_N8N_WEBHOOK_URL_HERE';
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let lastData = null;
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function fmtNum(n) {
+  if (!n && n !== 0) return '—';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toLocaleString();
+}
+
+function setStatus(msg) {
+  const bar = document.getElementById('statusBar');
+  bar.classList.add('visible');
+  document.getElementById('statusStep').textContent = msg;
+}
+
+function hideStatus() {
+  document.getElementById('statusBar').classList.remove('visible');
+}
+
+function showError(msg) {
+  const bar = document.getElementById('errorBar');
+  bar.classList.add('visible');
+  document.getElementById('errorMsg').textContent = msg;
+}
+
+function hideError() {
+  document.getElementById('errorBar').classList.remove('visible');
+}
+
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val || '—';
+}
+
+// ─── Tab Switching ─────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── Video Card Builder ────────────────────────────────────────────────────────
+function buildVideoCard(v, rank) {
+  const thumb = `https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg`;
+  const mins = v.durationSec ? Math.round(v.durationSec / 60) + 'min' : '';
+  const date = v.publishedAt ? v.publishedAt.slice(0, 10) : '';
+  return `
+    <div class="video-card">
+      <div class="video-thumb-wrap">
+        <img src="${thumb}" alt="${v.title}" loading="lazy" onerror="this.style.opacity=0">
+        <div class="video-rank">#${rank}</div>
+      </div>
+      <div class="video-body">
+        <div class="video-title">${v.title || '—'}</div>
+        <div class="video-meta">
+          <span class="video-pill views">▲ ${fmtNum(v.views)}</span>
+          ${mins ? `<span class="video-pill">${mins}</span>` : ''}
+          ${date ? `<span class="video-pill">${date}</span>` : ''}
+        </div>
+        <a class="video-link" href="${v.url}" target="_blank" rel="noopener">
+          Watch ↗
+        </a>
+      </div>
+    </div>`;
+}
+
+function renderVideoGrid(gridId, videos) {
+  const el = document.getElementById(gridId);
+  if (!el) return;
+  if (!videos || videos.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-sub">No videos in this category.</div></div>';
+    return;
+  }
+  el.innerHTML = videos.map((v, i) => buildVideoCard(v, i + 1)).join('');
+}
+
+// ─── Render Results ────────────────────────────────────────────────────────────
+function renderResults(data) {
+  lastData = data;
+  const ch = data.channel || data;
+  const v  = data.videos   || {};
+  const a  = data.analysis || {};
+
+  // Channel card
+  const thumb = document.getElementById('chanThumb');
+  if (ch.thumbnailUrl) { thumb.src = ch.thumbnailUrl; thumb.style.display = 'block'; }
+  else thumb.style.display = 'none';
+
+  setText('chanName', ch.name || ch.channelName);
+  setText('chanDesc', ch.description);
+  setText('chanSubs', fmtNum(ch.subscribers));
+  setText('chanVideos', fmtNum(ch.totalVideos));
+  setText('chanLongform', fmtNum(ch.totalLongFormAnalyzed || data.totalLongFormFetched));
+  setText('chanTranscripts', fmtNum(data.transcriptCount));
+
+  // Analysis cards
+  setText('a-summary',   a.channelSummary);
+  setText('a-patterns',  a.contentPatterns);
+  setText('a-hooks',     a.hookPatterns);
+  setText('a-titles',    a.titleFrameworks);
+  setText('a-emotions',  a.emotionalTriggers);
+  setText('a-now',       a.whatWorksNow);
+  setText('a-evolution', a.oldVsNewInsights);
+  setText('a-scripts',   a.scriptAngles);
+
+  // Ideas list
+  const ideasEl = document.getElementById('a-ideas');
+  const ideas = Array.isArray(a.actionableIdeas) ? a.actionableIdeas : [];
+  if (ideas.length) {
+    ideasEl.innerHTML = ideas.map((idea, i) => `
+      <li class="idea-item">
+        <span class="idea-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="idea-text">${idea}</span>
+      </li>`).join('');
+  } else {
+    ideasEl.innerHTML = '<li class="idea-item"><span class="idea-text">—</span></li>';
+  }
+
+  // Video grids
+  renderVideoGrid('grid-popular',    v.mostPopular);
+  renderVideoGrid('grid-recent90',   v.mostPopularRecent);
+  renderVideoGrid('grid-mostrecent', v.mostRecent);
+  renderVideoGrid('grid-first',      v.firstUploaded);
+
+  // Report
+  document.getElementById('reportBody').textContent = data.report || '—';
+
+  // JSON
+  document.getElementById('jsonBody').textContent = JSON.stringify(data, null, 2);
+
+  // Footer
+  const gen = data.generatedAt || ch.generatedAt;
+  if (gen) document.getElementById('footerGen').textContent = 'Generated ' + new Date(gen).toLocaleString();
+
+  // Show results
+  document.getElementById('results').classList.add('visible');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── Main Analysis ─────────────────────────────────────────────────────────────
+async function runAnalysis() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) {
+    showError('Please enter a YouTube channel URL.');
+    return;
+  }
+
+  // Reset
+  hideError();
+  document.getElementById('results').classList.remove('visible');
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  const steps = [
+    'Fetching channel data...',
+    'Loading video catalog...',
+    'Categorizing videos...',
+    'Fetching transcripts...',
+    'Running AI analysis...',
+    'Building report...'
+  ];
+
+  let stepIdx = 0;
+  setStatus(steps[stepIdx]);
+  const stepTimer = setInterval(() => {
+    stepIdx = Math.min(stepIdx + 1, steps.length - 1);
+    setStatus(steps[stepIdx]);
+  }, 8000);
+
+  try {
+    // n8n form trigger expects form-encoded data with field name matching the label
+    const formData = new FormData();
+    formData.append('url', url);
+
+    const res = await fetch(N8N_WEBHOOK_URL, {
+      method: 'POST',
+      body: formData
+    });
+
+    clearInterval(stepTimer);
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`n8n returned ${res.status}: ${errText.slice(0, 200)}`);
+    }
+
+    const json = await res.json();
+
+    // Handle both direct data and wrapped { success, data } response
+    const payload = json.data || json;
+
+    if (json.success === false) {
+      throw new Error(json.error || 'Workflow returned an error');
+    }
+
+    hideStatus();
+    renderResults(payload);
+
+  } catch (err) {
+    clearInterval(stepTimer);
+    hideStatus();
+    showError(err.message || 'Network error. Check that n8n is running and the webhook URL is correct.');
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+// ─── Copy Buttons ──────────────────────────────────────────────────────────────
+function copyReport() {
+  const text = document.getElementById('reportBody').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyReportBtn');
+    btn.textContent = 'Copied ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyJson() {
+  const text = document.getElementById('jsonBody').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyJsonBtn');
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  });
+}
+
+// ─── Enter key shortcut ────────────────────────────────────────────────────────
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') runAnalysis();
+});
+</script>
+</body>
+</html>
